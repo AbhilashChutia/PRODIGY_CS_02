@@ -8,5 +8,5 @@ Original Image - Windows Desktop Wallpaper
 Encrypted with a Pixel Manipulation of 100 units
 
 ![encrypted_255](https://github.com/user-attachments/assets/df029eed-4372-4ace-a466-122d6a8ed926) <br>
-Encrypted with a Pixel Manipulation of 155 units
+Encrypted with a Pixel Manipulation of 255 units
 

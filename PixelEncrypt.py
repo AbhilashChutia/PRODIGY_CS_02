@@ -1,53 +1,94 @@
-from PIL import Image
+import tkinter as tk
+from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk
 import numpy as np
 
-# Encryption and decryption key (you can change this to any value)
-ENCRYPTION_KEY = 255  # Simple XOR key
+ENCRYPTION_KEY = 255
 
 def encrypt_image(input_image_path, output_image_path):
-    # Open the input image
-    img = Image.open(input_image_path)
-    img = img.convert('RGB')  # Ensure image is in RGB mode
-    
-    # Convert image to NumPy array
-    data = np.array(img)
-    
-    # Encrypt each pixel by applying XOR with the ENCRYPTION_KEY
-    encrypted_data = np.bitwise_xor(data, ENCRYPTION_KEY)
-    
-    # Convert the encrypted data back to an image
-    encrypted_img = Image.fromarray(encrypted_data.astype(np.uint8))
-    
-    # Save the encrypted image
-    encrypted_img.save(output_image_path)
-    print(f"Image encrypted and saved to {output_image_path}")
+    try:
+        img = Image.open(input_image_path)
+        img = img.convert('RGB')  
+
+        data = np.array(img)
+        
+        encrypted_data = np.bitwise_xor(data, ENCRYPTION_KEY)
+        
+        encrypted_img = Image.fromarray(encrypted_data.astype(np.uint8))
+        
+        encrypted_img.save(output_image_path)
+        messagebox.showinfo("Success", f"Image encrypted and saved to {output_image_path}")
+        
+        display_images(img, encrypted_img)
+        
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
 
 def decrypt_image(input_image_path, output_image_path):
-    # Open the encrypted image
-    img = Image.open(input_image_path)
-    img = img.convert('RGB')
-    
-    # Convert image to NumPy array
-    data = np.array(img)
-    
-    # Decrypt each pixel by applying XOR with the ENCRYPTION_KEY (reverses the encryption)
-    decrypted_data = np.bitwise_xor(data, ENCRYPTION_KEY)
-    
-    # Convert the decrypted data back to an image
-    decrypted_img = Image.fromarray(decrypted_data.astype(np.uint8))
-    
-    # Save the decrypted image
-    decrypted_img.save(output_image_path)
-    print(f"Image decrypted and saved to {output_image_path}")
+    try:
+        img = Image.open(input_image_path)
+        img = img.convert('RGB')
+        
+        data = np.array(img)
+        
+        decrypted_data = np.bitwise_xor(data, ENCRYPTION_KEY)
+        
+        decrypted_img = Image.fromarray(decrypted_data.astype(np.uint8))
+        
+        decrypted_img.save(output_image_path)
+        messagebox.showinfo("Success", f"Image decrypted and saved to {output_image_path}")
+        
+        display_images(img, decrypted_img)
+        
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {e}")
 
-# Example usage:
-if __name__ == "__main__":
-    input_image = 'image.jpeg'   # Path to the input image
-    encrypted_image = 'encrypted_image.jpg'  # Path to save the encrypted image
-    decrypted_image = 'decrypted_image.jpg'  # Path to save the decrypted image
+def select_file_encrypt():
+    input_image_path = filedialog.askopenfilename(title="Select Image to Encrypt")
+    if input_image_path:
+        output_image_path = filedialog.asksaveasfilename(defaultextension=".jpg", title="Save Encrypted Image As")
+        if output_image_path:
+            encrypt_image(input_image_path, output_image_path)
+
+def select_file_decrypt():
+    input_image_path = filedialog.askopenfilename(title="Select Encrypted Image to Decrypt")
+    if input_image_path:
+        output_image_path = filedialog.asksaveasfilename(defaultextension=".jpg", title="Save Decrypted Image As")
+        if output_image_path:
+            decrypt_image(input_image_path, output_image_path)
+
+def display_images(original_img, processed_img):
+   
+    original_img_resized = original_img.resize((200, 200))
+    processed_img_resized = processed_img.resize((200, 200))
     
-    # Encrypt the image
-    encrypt_image(input_image, encrypted_image)
     
-    # Decrypt the image
-    decrypt_image(encrypted_image, decrypted_image)
+    original_photo = ImageTk.PhotoImage(original_img_resized)
+    processed_photo = ImageTk.PhotoImage(processed_img_resized)
+    
+    original_label.config(image=original_photo, text="Original Image")
+    original_label.image = original_photo  
+    
+    processed_label.config(image=processed_photo, text="Processed Image")
+    processed_label.image = processed_photo 
+
+    root.geometry("600x400")
+
+root = tk.Tk()
+root.title("Image Encryption/Decryption")
+
+root.geometry("500x100")
+
+encrypt_button = tk.Button(root, text="Encrypt Image", command=select_file_encrypt, width=25)
+encrypt_button.pack(pady=10)
+
+decrypt_button = tk.Button(root, text="Decrypt Image", command=select_file_decrypt, width=25)
+decrypt_button.pack(pady=10)
+
+original_label = tk.Label(root, text="", width=200, height=200)
+original_label.pack(side=tk.LEFT, padx=20, pady=10)
+
+processed_label = tk.Label(root, text="", width=200, height=200)
+processed_label.pack(side=tk.RIGHT, padx=20, pady=10)
+
+root.mainloop()
